@@ -100,10 +100,17 @@ function App() {
   }, [location]);
 
   return (
+    <>
     <div
       ref={containerRef}
-      className="globe-container"
+      className="w-screen h-screen"
     />
+    <div className="absolute top-0 left-0">
+     <p className="text-white">ISS Tracker</p>
+     <p className="text-white">Latitude: {location ? location.iss_position.latitude : '...'}</p>
+     <p className="text-white">Longitude: {location ? location.iss_position.longitude : '...'}</p>
+    </div>
+    </>
   );
 }
 
