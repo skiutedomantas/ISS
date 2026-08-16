@@ -91,10 +91,27 @@ function App() {
       coords.y,
       coords.z
     );
+    const up = obj.position.clone().normalize();
 
-    obj.rotation.x = THREE.MathUtils.degToRad(120);
-    obj.rotation.y = THREE.MathUtils.degToRad(180);
-    obj.rotation.z = THREE.MathUtils.degToRad(45);
+    const reference = new THREE.Vector3(0, 1, 0);
+
+    const forward = new THREE.Vector3()
+        .crossVectors(reference, up)
+        .normalize();
+
+    const right = new THREE.Vector3()
+        .crossVectors(up, forward)
+        .normalize();
+
+    const matrix = new THREE.Matrix4();
+
+    matrix.makeBasis(
+        right,
+        up,
+        forward
+      );
+
+    obj.quaternion.setFromRotationMatrix(matrix);
 
   });
   }, [location]);
