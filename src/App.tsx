@@ -2,8 +2,22 @@ import { useEffect, useRef, useState } from "react";
 import Globe from "globe.gl";
 import "./App.css";
 import Space from "./assets/Stars.png";
+import ISS from './assets/iss.glb';
+import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 function App() {
+
+  const issModelRef = useRef(null);
+
+  useEffect(() => {
+  const loader = new GLTFLoader();
+  loader.load(ISS, (gltf) => {
+    issModelRef.current = gltf.scene;
+  });
+}, []);
+  
+
   const containerRef = useRef(null);
   const globeRef = useRef(null);
 
@@ -29,7 +43,7 @@ function App() {
 
     fetchLocation();
 
-    const interval = setInterval(fetchLocation, 5000);
+    const interval = setInterval(fetchLocation, 10000);
 
     return () => clearInterval(interval);
   }, []);
@@ -50,23 +64,39 @@ function App() {
 
   useEffect(() => {
     if (!location?.iss_position || !globeRef.current) return;
+    if (!globeRef.current) return;
+    if (!issModelRef.current) return;
 
     const lat = Number(location.iss_position.latitude);
     const lng = Number(location.iss_position.longitude);
 
-    console.log("ISS:", lat, lng);
-
     globeRef.current
-      .pointsData([
-        {
-          lat,
-          lng,
-          size: 1,
-          color: "red",
-        },
-      ])
-      .pointAltitude(0.1)
-      .pointColor("color");
+  .customLayerData([
+    {
+      lat,
+      lng,
+      altitude: 0.1,
+    },
+  ])
+  .customThreeObject(() => issModelRef.current.clone(true))
+  .customThreeObjectUpdate((obj, data) => {
+    const coords = globeRef.current.getCoords(
+      data.lat,
+      data.lng,
+      data.altitude
+    );
+
+    obj.position.set(
+      coords.x,
+      coords.y,
+      coords.z
+    );
+
+    obj.rotation.x = THREE.MathUtils.degToRad(120);
+    obj.rotation.y = THREE.MathUtils.degToRad(180);
+    obj.rotation.z = THREE.MathUtils.degToRad(45);
+
+  });
   }, [location]);
 
   return (
