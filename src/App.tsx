@@ -43,19 +43,40 @@ function App() {
 
     fetchLocation();
 
-    const interval = setInterval(fetchLocation, 10000);
+    const interval = setInterval(fetchLocation, 5000);
 
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
+
+          const path = [
+      { lat: 0, lng: 0 },
+      {lat: 0, lng: 180},
+      { lat: 0, lng: 360 },
+    ];
+
+    const otherpath = [
+      {lat: 0, lng: 0},
+      {lat:180, lng: 0},
+      {lat: 360, lng: 0}
+    ]
+
     globeRef.current = Globe()(containerRef.current)
       .backgroundImageUrl(Space)
       .globeImageUrl(
         "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/imagerecords/144000/144898/BlackMarble_2016_01deg.jpg"
       )
       .atmosphereAltitude(0.2)
-      .atmosphereColor("grey");
+      .atmosphereColor("grey")
+      .pathsData([path, otherpath])
+      .pathPointLat("lat")
+      .pathPointLng("lng")
+      .pathColor(() => "grey")
+      .pathStroke(.5)
+      .pathDashLength(0.5)
+      .pathDashGap(0.5)
+      .pathDashAnimateTime(2000);
 
     return () => {
       globeRef.current?._destructor?.();
@@ -122,10 +143,10 @@ function App() {
       ref={containerRef}
       className="w-screen h-screen"
     />
-    <div className="absolute top-0 left-0">
-     <p className="text-white">ISS Tracker</p>
-     <p className="text-white">Latitude: {location ? location.iss_position.latitude : '...'}</p>
-     <p className="text-white">Longitude: {location ? location.iss_position.longitude : '...'}</p>
+    <div className="absolute top-10 left-10 flex flex-col gap-3">
+     <p className="font-michroma text-2xl text-neutral-300">ISS Tracker</p>
+     <p className="text-white font-michroma">Latitude: {location ? location.iss_position.latitude : '...'}</p>
+     <p className="text-white font-michroma">Longitude: {location ? location.iss_position.longitude : '...'}</p>
     </div>
     </>
   );
