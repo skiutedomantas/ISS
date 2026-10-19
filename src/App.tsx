@@ -49,7 +49,7 @@ function App() {
     async function fetchLocation() {
       try {
         const response = await fetch(
-          "https://api.open-notify.org/iss-now.json"
+          "http://api.open-notify.org/iss-now.json"
         );
 
         if (!response.ok) {
